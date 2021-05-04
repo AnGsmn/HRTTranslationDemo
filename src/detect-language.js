@@ -36,7 +36,7 @@ function main(params) {
   return new Promise(function (resolve, reject) {
 
     try {
-      
+
       // *******TODO**********
       // - Call the language identification API of the translation service
       // see: https://cloud.ibm.com/apidocs/language-translator?code=node#identify-language
@@ -47,10 +47,37 @@ function main(params) {
       // in case of errors during the call resolve with an error message according to the pattern 
       // found in the catch clause below
 
+      // Create new Language Translator
+      const languageTranslator = new LanguageTranslatorV3({
+        version: '2021-05-04',
+        authenticator: new IamAuthenticator({
+          apikey: 'n6bD8lOgC4xf8lTiRckwRrhrpx1cCmizP3dTzkxQG8Pq',
+        }),
+        serviceUrl: 'https://api.eu-de.language-translator.watson.cloud.ibm.com/instances/62c194d1-535e-4bb5-b333-930387bb70fa',
+        disableSslVerification: true,
+      });
+
+
+      // Error Handling
+      languageTranslator.method(params)
+        .catch(err => {
+          console.log('error:', err);
+        });
+
+      // Check for supported language
+      languageTranslator.listLanguages(params)
+        .then(languages => {
+          console.log(JSON.stringify(languages, null, 2));
+        })
+        .catch(err => {
+          console.log('error:', err);
+        });
+
+
       resolve({
         statusCode: 200,
         body: {
-          text: params.text, 
+          text: params.text,
           language: "<Best Language>",
           confidence: 0.5,
         },
